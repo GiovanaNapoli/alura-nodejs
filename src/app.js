@@ -1,5 +1,6 @@
 import express from "express";
 import connectToDataBase from "./config/dbConnect.js";
+import book from "./models/Book.js";
 
 const connect = await connectToDataBase();
 
@@ -14,17 +15,13 @@ connect.connection.once("open", () => {
 const app = express();
 app.use(express.json());
 
-const livros = [
-  { id: 1, titulo: "Os sete maridos de Evelyn Hugo" },
-  { id: 2, titulo: "Rapido e devagar" },
-];
-
 app.get("/", (request, response) => {
   response.status(200).send("Curso de node.js");
 });
 
-app.get("/livros", (request, response) => {
-  response.status(200).json(livros);
+app.get("/livros", async (request, response) => {
+  const listBooks = await book.find({});
+  response.status(200).json(listBooks);
 });
 
 app.post("/livros", (request, response) => {
@@ -51,9 +48,5 @@ app.delete("/livros/:id", (request, response) => {
 
   response.status(204).send("Livro removido com sucesso");
 });
-
-function getById(id) {
-  return livros.find((l) => l.id === id);
-}
 
 export default app;
