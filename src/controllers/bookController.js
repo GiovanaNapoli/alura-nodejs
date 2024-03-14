@@ -92,4 +92,20 @@ export default class BookController {
       });
     }
   }
+
+  static async listBooksByPublishingCompany(request, response) {
+    const publishingCompany = request.query.editora;
+    try {
+      const booksByPublishingCompany = await book.find({
+        publishingCompany: publishingCompany,
+      });
+
+      response.status(200).json(booksByPublishingCompany);
+    } catch (error) {
+      console.error(error);
+      response.status(500).json({
+        message: `error: ${error.message} - falha ao listar livros`,
+      });
+    }
+  }
 }
