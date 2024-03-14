@@ -1,7 +1,7 @@
 import { author } from '../models/Author.js';
 
 export default class AuthorController {
-  static async getAllAuthors(request, response) {
+  static getAllAuthors = async (request, response) => {
     try {
       const listAuthors = await author.find({});
       response.status(200).json(listAuthors);
@@ -11,9 +11,9 @@ export default class AuthorController {
         message: `error: ${error.message} - falha ao listar autores`,
       });
     }
-  }
+  };
 
-  static async addAuthors(request, response) {
+  static addAuthors = async (request, response) => {
     try {
       const newAuthor = await author.create(request.body);
 
@@ -27,9 +27,9 @@ export default class AuthorController {
         message: `error: ${error.message} - falha ao cadastrar autor`,
       });
     }
-  }
+  };
 
-  static async getAuthorById(request, response) {
+  static getAuthorById = async (request, response) => {
     try {
       const id = request.params.id;
       const foundedAuthor = await author.findById(id);
@@ -40,9 +40,9 @@ export default class AuthorController {
         message: `error: ${error.message} - falha ao listar autor`,
       });
     }
-  }
+  };
 
-  static async updateAuthor(request, response) {
+  static updateAuthor = async (request, response) => {
     try {
       const id = request.params.id;
       await author.findByIdAndUpdate(id, request.body);
@@ -55,9 +55,9 @@ export default class AuthorController {
         message: `error: ${error.message} - falha ao atualizar autor`,
       });
     }
-  }
+  };
 
-  static async deleteAuthor(request, response) {
+  static deleteAuthor = async (request, response) => {
     try {
       const id = request.params.id;
       await author.findByIdAndDelete(id);
@@ -70,5 +70,5 @@ export default class AuthorController {
         message: `error: ${error.message} - falha ao deletar autor`,
       });
     }
-  }
+  };
 }

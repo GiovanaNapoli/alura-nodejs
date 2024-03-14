@@ -2,7 +2,7 @@ import { author } from '../models/Author.js';
 import book from '../models/Book.js';
 
 export default class BookController {
-  static async getAllBooks(request, response) {
+  static  getAllBooks = async (request, response) => {
     try {
       const listBooks = await book.find({});
       response.status(200).json(listBooks);
@@ -12,9 +12,9 @@ export default class BookController {
         message: `error: ${error.message} - falha ao listar livros`,
       });
     }
-  }
+  };
 
-  static async addBooks(request, response) {
+  static  addBooks = async (request, response) => {
     const newBook = request.body;
     try {
       const foundedAuthor = await author.findById(newBook.author);
@@ -32,9 +32,9 @@ export default class BookController {
         message: `error: ${error.message} - falha ao cadastrar livro`,
       });
     }
-  }
+  };
 
-  static async getBookById(request, response) {
+  static  getBookById = async(request, response) => {
     try {
       const id = request.params.id;
       const foundedBook = await book.findById(id);
@@ -45,9 +45,9 @@ export default class BookController {
         message: `error: ${error.message} - falha ao listar livro`,
       });
     }
-  }
+  };
 
-  static async updateBook(request, response) {
+  static  updateBook = async (request, response) => {
     const updateBook = request.body;
     const id = request.params.id;
 
@@ -76,9 +76,9 @@ export default class BookController {
         message: `error: ${error.message} - falha ao atualizar livro`,
       });
     }
-  }
+  };
 
-  static async deleteBook(request, response) {
+  static  deleteBook = async (request, response) =>  {
     try {
       const id = request.params.id;
       await book.findByIdAndDelete(id);
@@ -91,9 +91,9 @@ export default class BookController {
         message: `error: ${error.message} - falha ao deletar livro`,
       });
     }
-  }
+  };
 
-  static async listBooksByPublishingCompany(request, response) {
+  static  listBooksByPublishingCompany = async (request, response) => {
     const publishingCompany = request.query.editora;
     try {
       const booksByPublishingCompany = await book.find({
@@ -107,5 +107,5 @@ export default class BookController {
         message: `error: ${error.message} - falha ao listar livros`,
       });
     }
-  }
+  };
 }
