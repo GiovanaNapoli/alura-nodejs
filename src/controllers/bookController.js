@@ -1,3 +1,4 @@
+import { author } from "../models/Author.js";
 import book from "../models/Book.js";
 
 export default class BookController {
@@ -14,12 +15,16 @@ export default class BookController {
   }
 
   static async addBooks(request, response) {
+    const newBook = request.body;
     try {
-      const newBook = await book.create(request.body);
+      const foundedAuthor = await author.findById(newBook.author);
+      const completedBook = { ...newBook, author: { ...foundedAuthor._doc } };
+
+      await book.create(completedBook);
 
       response.status(201).json({
         message: "Criado com sucesso",
-        book: newBook,
+        book: completedBook,
       });
     } catch (error) {
       console.error(error);
@@ -43,9 +48,25 @@ export default class BookController {
   }
 
   static async updateBook(request, response) {
+    const updateBook = request.body;
+    const id = request.params.id;
+
     try {
-      const id = request.params.id;
-      await book.findByIdAndUpdate(id, request.body);
+      let completedBook = {};
+      if (updateBook.author) {
+        const foundedAuthor = await author.findById(updateBook.author);
+
+        completedBook = {
+          ...updateBook,
+          author: { ...foundedAuthor._doc },
+        };
+      } else {
+        completedBook = {
+          ...updateBook,
+        };
+      }
+
+      await book.findByIdAndUpdate(id, completedBook);
       response.status(200).json({
         message: "Livro atualizado",
       });
@@ -71,11 +92,4 @@ export default class BookController {
       });
     }
   }
-
-  // static errorHandler (error, response, message) {
-  //   console.error(error);
-  //     response.status(500).json({
-  //       message: `error: ${error.message} - ${message}`,
-  //     });
-  // }
 }
