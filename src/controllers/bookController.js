@@ -1,5 +1,5 @@
-import { author } from "../models/Author.js";
-import book from "../models/Book.js";
+import { author } from '../models/Author.js';
+import book from '../models/Book.js';
 
 export default class BookController {
   static async getAllBooks(request, response) {
@@ -23,7 +23,7 @@ export default class BookController {
       await book.create(completedBook);
 
       response.status(201).json({
-        message: "Criado com sucesso",
+        message: 'Criado com sucesso',
         book: completedBook,
       });
     } catch (error) {
@@ -68,7 +68,7 @@ export default class BookController {
 
       await book.findByIdAndUpdate(id, completedBook);
       response.status(200).json({
-        message: "Livro atualizado",
+        message: 'Livro atualizado',
       });
     } catch (error) {
       console.error(error);
@@ -83,7 +83,7 @@ export default class BookController {
       const id = request.params.id;
       await book.findByIdAndDelete(id);
       response.status(200).json({
-        message: "Livro deletado",
+        message: 'Livro deletado',
       });
     } catch (error) {
       console.error(error);

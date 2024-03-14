@@ -1,4 +1,4 @@
-import { author } from "../models/Author.js";
+import { author } from '../models/Author.js';
 
 export default class AuthorController {
   static async getAllAuthors(request, response) {
@@ -18,7 +18,7 @@ export default class AuthorController {
       const newAuthor = await author.create(request.body);
 
       response.status(201).json({
-        message: "Criado com sucesso",
+        message: 'Criado com sucesso',
         author: newAuthor,
       });
     } catch (error) {
@@ -47,7 +47,7 @@ export default class AuthorController {
       const id = request.params.id;
       await author.findByIdAndUpdate(id, request.body);
       response.status(200).json({
-        message: "Autor atualizado",
+        message: 'Autor atualizado',
       });
     } catch (error) {
       console.error(error);
@@ -62,7 +62,7 @@ export default class AuthorController {
       const id = request.params.id;
       await author.findByIdAndDelete(id);
       response.status(200).json({
-        message: "Autor deletado",
+        message: 'Autor deletado',
       });
     } catch (error) {
       console.error(error);

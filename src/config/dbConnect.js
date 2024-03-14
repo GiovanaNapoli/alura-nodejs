@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from 'mongoose';
 
 async function connectToDataBase() {
   return await mongoose.connect(process.env.STRING_CONNECTION);
