@@ -1,53 +1,55 @@
 import { author } from '../models/Author.js';
 import book from '../models/Book.js';
+import NotFound from '../errors/NotFound.js';
 
 export default class BookController {
-  static  getAllBooks = async (request, response) => {
+  static getAllBooks = async (request, response, next) => {
     try {
-      const listBooks = await book.find({});
+      const listBooks = await book.find({}).populate('author').exec();
       response.status(200).json(listBooks);
     } catch (error) {
-      console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao listar livros`,
-      });
+      next(error);
     }
   };
 
-  static  addBooks = async (request, response) => {
+  static addBooks = async (request, response, next) => {
     const newBook = request.body;
     try {
+      let completedBook;
       const foundedAuthor = await author.findById(newBook.author);
-      const completedBook = { ...newBook, author: { ...foundedAuthor._doc } };
+      if (foundedAuthor) {
+        completedBook = { ...newBook, author: { ...foundedAuthor._doc } };
 
-      await book.create(completedBook);
+        await book.create(completedBook);
 
-      response.status(201).json({
-        message: 'Criado com sucesso',
-        book: completedBook,
-      });
+        response.status(201).json({
+          message: 'Criado com sucesso',
+          book: completedBook,
+        });
+      } else {
+        next(new NotFound('Id do autor não localizado'));
+      }
     } catch (error) {
-      console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao cadastrar livro`,
-      });
+      next(error);
     }
   };
 
-  static  getBookById = async(request, response) => {
+  static getBookById = async (request, response, next) => {
     try {
       const id = request.params.id;
       const foundedBook = await book.findById(id);
-      response.status(200).json(foundedBook);
+
+      if (foundedBook) {
+        response.status(200).json(foundedBook);
+      } else {
+        next(new NotFound('Id  não localizado'));
+      }
     } catch (error) {
-      console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao listar livro`,
-      });
+      next(error);
     }
   };
 
-  static  updateBook = async (request, response) => {
+  static updateBook = async (request, response, next) => {
     const updateBook = request.body;
     const id = request.params.id;
 
@@ -56,44 +58,50 @@ export default class BookController {
       if (updateBook.author) {
         const foundedAuthor = await author.findById(updateBook.author);
 
-        completedBook = {
-          ...updateBook,
-          author: { ...foundedAuthor._doc },
-        };
+        if (foundedAuthor) {
+          completedBook = {
+            ...updateBook,
+            author: { ...foundedAuthor._doc },
+          };
+        } else {
+          next(new NotFound('Id do autor não localizado'));
+        }
       } else {
         completedBook = {
           ...updateBook,
         };
       }
 
-      await book.findByIdAndUpdate(id, completedBook);
-      response.status(200).json({
-        message: 'Livro atualizado',
-      });
+      const updatedBook = await book.findByIdAndUpdate(id, completedBook);
+      if (updatedBook) {
+        response.status(200).json({
+          message: 'Livro atualizado',
+        });
+      } else {
+        next(new NotFound('Id  não localizado'));
+      }
     } catch (error) {
-      console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao atualizar livro`,
-      });
+      next(error);
     }
   };
 
-  static  deleteBook = async (request, response) =>  {
+  static deleteBook = async (request, response, next) => {
     try {
       const id = request.params.id;
-      await book.findByIdAndDelete(id);
-      response.status(200).json({
-        message: 'Livro deletado',
-      });
+      const deleteBook = await book.findByIdAndDelete(id);
+      if (deleteBook) {
+        response.status(200).json({
+          message: 'Livro deletado',
+        });
+      } else {
+        next(new NotFound('Id  não localizado'));
+      }
     } catch (error) {
-      console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao deletar livro`,
-      });
+      next(error);
     }
   };
 
-  static  listBooksByPublishingCompany = async (request, response) => {
+  static listBooksByPublishingCompany = async (request, response, next) => {
     const publishingCompany = request.query.editora;
     try {
       const booksByPublishingCompany = await book.find({
@@ -102,10 +110,7 @@ export default class BookController {
 
       response.status(200).json(booksByPublishingCompany);
     } catch (error) {
-      console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao listar livros`,
-      });
+      next(error);
     }
   };
 }

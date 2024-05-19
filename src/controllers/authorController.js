@@ -1,74 +1,88 @@
+import NotFound from '../errors/NotFound.js';
 import { author } from '../models/Author.js';
 
 export default class AuthorController {
-  static getAllAuthors = async (request, response) => {
+  static getAllAuthors = async (request, response, next) => {
     try {
       const listAuthors = await author.find({});
-      response.status(200).json(listAuthors);
+      response.status(200).json({
+        ok: true,
+        author: listAuthors,
+      });
     } catch (error) {
       console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao listar autores`,
-      });
+      next(error);
     }
   };
 
-  static addAuthors = async (request, response) => {
+  static addAuthors = async (request, response, next) => {
     try {
       const newAuthor = await author.create(request.body);
 
       response.status(201).json({
+        ok: true,
         message: 'Criado com sucesso',
         author: newAuthor,
       });
     } catch (error) {
       console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao cadastrar autor`,
-      });
+      next(error);
     }
   };
 
-  static getAuthorById = async (request, response) => {
+  static getAuthorById = async (request, response, next) => {
     try {
       const id = request.params.id;
       const foundedAuthor = await author.findById(id);
-      response.status(200).json(foundedAuthor);
+
+      if (foundedAuthor) {
+        response.status(200).json({
+          ok: true,
+          author: foundedAuthor,
+        });
+      } else {
+        next(new NotFound('Id não localizado'));
+      }
     } catch (error) {
       console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao listar autor`,
-      });
+      next(error);
     }
   };
 
-  static updateAuthor = async (request, response) => {
+  static updateAuthor = async (request, response, next) => {
     try {
       const id = request.params.id;
-      await author.findByIdAndUpdate(id, request.body);
-      response.status(200).json({
-        message: 'Autor atualizado',
-      });
+      const result = await author.findByIdAndUpdate(id, request.body);
+
+      if (result !== null) {
+        response.status(200).json({
+          ok: true,
+          message: 'Autor atualizado',
+        });
+      } else {
+        next(new NotFound('Id não localizado'));
+      }
     } catch (error) {
       console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao atualizar autor`,
-      });
+      next(error);
     }
   };
 
-  static deleteAuthor = async (request, response) => {
+  static deleteAuthor = async (request, response, next) => {
     try {
       const id = request.params.id;
-      await author.findByIdAndDelete(id);
-      response.status(200).json({
-        message: 'Autor deletado',
-      });
+      const result = await author.findByIdAndDelete(id);
+      if (result !== null) {
+        response.status(200).json({
+          ok: true,
+          message: 'Autor deletado',
+        });
+      } else {
+        next(new NotFound('Id não localizado'));
+      }
     } catch (error) {
       console.error(error);
-      response.status(500).json({
-        message: `error: ${error.message} - falha ao deletar autor`,
-      });
+      next(error);
     }
   };
 }
